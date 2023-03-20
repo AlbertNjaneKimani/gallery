@@ -31,10 +31,11 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'render', usernameVariable: 'RENDER_EMAIL', passwordVariable: 'RENDER_PASSWORD')]) {
                     sh "curl -L https://render.com/download/cli/latest/linux/render -o ~/render && chmod +x ~/render" // Download the Render CLI tool and make it executable
                     sh "~/render login --email $RENDER_EMAIL --password $RENDER_PASSWORD" // Authenticate the Render CLI tool with your Render account
-                    sh "~/render deploy --directory gallery --name $RENDER_SERVICE_NAME --project $RENDER_PROJECT_ID" // Deploy the Node.js application to Render
+                    sh "sh "~/render deploy --directory gallery --name $RENDER_SERVICE_NAME --project $RENDER_PROJECT_ID --verbose"
+" // Deploy the Node.js application to Render
                 }
             }
         }
     }
-    
+
 }
