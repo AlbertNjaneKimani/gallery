@@ -40,6 +40,7 @@ pipeline {
             steps {
                 sh '''
                    curl -X POST https://api.render.com/deploy/srv-cgbni61mbg55nqndm9n0?key=$COMMIT
+                   '''
             }
         }
         stage('End') {
