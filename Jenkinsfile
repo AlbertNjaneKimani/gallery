@@ -51,8 +51,10 @@ pipeline {
     }
     post {
             failure {
-                mail to: 'albertnjanek@gmail.com,
+                mail to: 'albertnjanek@gmail.com',
                 subject:"FAILURE: ${currentBuild.fullDisplayName}",
                 body: "Pipeline Failed."
             }
+        }
+        
         }
