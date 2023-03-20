@@ -39,8 +39,7 @@ pipeline {
         stage('Deploy to Render') {
             steps {
                 sh '''
-                   curl -X POST https://api.render.com/deploy/srv-cgbni61mbg55nqndm9n0?key=tubczx8HU-4?key=$COMMIT
-                   '''
+                   curl -X POST https://api.render.com/deploy/srv-cgbni61mbg55nqndm9n0?key=$COMMIT
             }
         }
         stage('End') {
