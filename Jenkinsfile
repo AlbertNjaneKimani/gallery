@@ -20,11 +20,6 @@ pipeline {
                 sh 'cd gallery && npm install' // Install the Node.js dependencies
             }
         }
-        stage('Build') {
-            steps {
-                sh 'cd gallery && npm run build' // Build the Node.js application
-            }
-        }
         stage('Deploy to Render') {
             steps {
                 // Use the Render CLI tool to deploy the Node.js application
