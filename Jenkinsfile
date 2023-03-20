@@ -1,36 +1,58 @@
 pipeline {
-    agent any // Use any available agent for this pipeline
-
-    // Define environment variables for the pipeline
-    environment {
-        RENDER_EMAIL = credentials('albertnjanek@mail.com') // Retrieve the Render email credential from Jenkins
-        RENDER_PASSWORD = credentials('P@55word') // Retrieve the Render password credential from Jenkins
-        RENDER_PROJECT_ID = 'render' // Set your Render project ID
-        RENDER_SERVICE_NAME = 'jenkins3' // Set your Render service name
-    }
+    agent any
+    
+    tools {nodejs "node"}
 
     stages {
-        stage('Clone repository') {
+        stage('Start') {
             steps {
-                git 'https://github.com/AlbertNjaneKimani/gallery.git' // Clone the repository from GitHub
+                echo 'started running the pipeline'
             }
         }
-        stage('Install dependencies') {
+        stage('Clone the repository') {
             steps {
-                sh 'cd gallery && npm install' // Install the Node.js dependencies
+                git url: 'https://github.com/AlbertNjaneKimani/gallery.git', branch: 'master'
             }
         }
+        stage('Get Latest Commit') {
+            steps {
+                sh '''
+                   export COMMIT=$(git log --oneline | awk '{print $1}' | head -n 1)
+                   echo $COMMIT
+                   '''
+            }
+        }
+        stage('Install node dependencies') {
+            steps {
+                sh '''
+                   npm install
+                   '''
+            }
+        }
+        // stage('Run Tests') {
+        //     steps {
+        //         sh '''
+        //         npm test
+        //         '''
+        //     }
+        // }
         stage('Deploy to Render') {
             steps {
-                // Use the Render CLI tool to deploy the Node.js application
-                withCredentials([usernamePassword(credentialsId: 'render', usernameVariable: 'RENDER_EMAIL', passwordVariable: 'RENDER_PASSWORD')]) {
-                    sh "curl -L https://render.com/download/cli/latest/linux/render -o ~/render && chmod +x ~/render" // Download the Render CLI tool and make it executable
-                    sh "~/render login --email $RENDER_EMAIL --password $RENDER_PASSWORD" // Authenticate the Render CLI tool with your Render account
-                    sh "sh "~/render deploy --directory gallery --name $RENDER_SERVICE_NAME --project $RENDER_PROJECT_ID --verbose"
-" // Deploy the Node.js application to Render
-                }
+                sh '''
+                   curl -X POST https://api.render.com/deploy/srv-cg91cbt269vfa5frducg?key=$COMMIT
+                   '''
+            }
+        }
+        stage('End') {
+            steps {
+                echo 'The build has ended'
             }
         }
     }
-    
-}
+    post {
+            failure {
+                mail to: 'albertnjanek@gmail.com,
+                subject:"FAILURE: ${currentBuild.fullDisplayName}",
+                body: "Pipeline Failed."
+            }
+        }
