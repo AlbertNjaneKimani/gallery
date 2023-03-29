@@ -43,6 +43,14 @@ pipeline {
                    '''
             }
         }
+         stage('Send Slack Notification') {
+            when {
+                expression { currentBuild.result == 'SUCCESS' }
+            }
+            steps {
+                slackSend channel: '#albert_ip', color: 'good', message: "Deployment successful for build ID: ${env.BUILD_ID}. Site available at https://jenkins3.onrender.com"
+            }
+        }
         stage('End') {
             steps {
                 echo 'The build has ended'
